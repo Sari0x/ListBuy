@@ -780,6 +780,44 @@ input[type="range"] {
   background: var(--fg);
 }
 
+/* ── Acciones + confirmación de borrado en historial ── */
+.history-entry-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.history-del-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--fg);
+  opacity: 0.45;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.history-del-btn:hover { opacity: 0.9; }
+
+.history-confirm {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--fg-15);
+}
+.history-confirm-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 10px;
+}
+.history-confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+
 /* ═══════════════════════════════════════════════════
    COMPARAR PRECIOS  (vista)
 ═══════════════════════════════════════════════════ */

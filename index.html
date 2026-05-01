@@ -86,10 +86,10 @@
         </div>
       </div>
 
-      <!-- Botón compartir + pie decorativo -->
+      <!-- Botón terminar compra + pie decorativo -->
       <div id="shareBlock" hidden>
         <div class="share-section mx">
-          <button class="btn-outline" id="btnShare">ENVIAR POR WHATSAPP →</button>
+          <button class="btn-primary" id="btnShare">TERMINAR COMPRA</button>
         </div>
       </div>
 
@@ -146,24 +146,29 @@
       <div class="view-body" id="compareBody"></div>
     </div>
 
-    <!-- ── Modal compartir ── -->
+    <!-- ── Modal terminar compra ── -->
     <div class="modal-backdrop" id="shareBackdrop" aria-hidden="true"></div>
-    <div class="modal-center" id="shareModal" role="dialog" aria-modal="true" aria-label="Compartir lista" hidden>
+    <div class="modal-center" id="shareModal" role="dialog" aria-modal="true" aria-label="Terminar compra" hidden>
       <div class="modal-hdr">
-        <span class="lbl">Compartir lista</span>
+        <span class="lbl">Tu ticket</span>
         <button class="btn-raw modal-close" id="btnCloseShare" aria-label="Cerrar">×</button>
       </div>
+
       <pre class="msg-preview" id="msgPreview"></pre>
-      <div class="lbl" style="margin-bottom:10px">Enviar a</div>
-      <div id="contactsList"></div>
+
       <div class="modal-actions">
-        <button class="btn-outline flex-1" id="btnCopy">Copiar texto</button>
-        <button class="btn-primary flex-2" id="btnOpenWA">Abrir WhatsApp →</button>
+        <button class="btn-outline flex-1" id="btnCopy">Copiar</button>
+        <button class="btn-primary flex-2" id="btnOpenWA">WhatsApp →</button>
       </div>
-      <div class="sep-dotted" style="margin:16px 0"></div>
-      <div class="lbl" style="margin-bottom:8px; opacity:.55">ARCHIVAR ESTA COMPRA</div>
-      <input id="archiveStore" class="inp" type="text" placeholder="Nombre del local…" autocomplete="off">
-      <button class="btn-outline" id="btnArchive" style="margin-top:10px; width:100%">GUARDAR COMO COMPRA REALIZADA</button>
+
+      <div class="sep-dotted" style="margin:18px 0 14px"></div>
+
+      <div class="lbl" style="margin-bottom:8px; opacity:.55">ARCHIVAR COMPRA</div>
+      <input id="archiveStore" class="inp" type="text"
+             placeholder="Nombre del local (ej: Coto, Disco…)" autocomplete="off">
+      <button class="btn-outline" id="btnArchive" style="margin-top:12px; width:100%">
+        GUARDAR EN HISTORIAL
+      </button>
     </div>
 
     <!-- ── Modal editar item ── -->
