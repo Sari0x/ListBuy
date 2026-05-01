@@ -4,173 +4,184 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="description" content="Administrá tu lista de compras y compartila por WhatsApp.">
-  <title>ListBuy · Lista de Compras</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <meta name="description" content="Lista de compras con historial, presupuesto y compartir por WhatsApp.">
+  <title>LISTBUY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-  <!-- ═══ HEADER ══════════════════════════════════════════════════ -->
-  <header class="app-header">
-    <div class="hdr-left"></div>
+  <div class="receipt-wrapper">
 
-    <div class="logo-wrap">
-      <img
-        class="logo-img"
-        src="https://i.postimg.cc/ht3b8W8T/Gemini-Generated-Image-kl7kxzkl7kxzkl7k-removebg-preview.png"
-        alt="ListBuy">
-    </div>
+    <!-- Borde superior dentado -->
+    <svg class="paper-edge" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,0 L0,3 L4,6 L8,3 L12,6 L16,3 L20,6 L24,3 L28,6 L32,3 L36,6 L40,3 L44,6 L48,3 L52,6 L56,3 L60,6 L64,3 L68,6 L72,3 L76,6 L80,3 L84,6 L88,3 L92,6 L96,3 L100,6 L100,0 Z"/>
+    </svg>
 
-    <div class="hdr-right">
-      <div class="sync-pill syncing" id="syncPill">
-        <span class="dot"></span>
-        <span id="syncLabel">Conectando…</span>
+    <!-- Área de scroll del recibo -->
+    <div class="receipt-scroll" id="receiptScroll">
+
+      <!-- Header -->
+      <div class="r-header">
+        <button class="btn-raw btn-menu" id="btnMenu" aria-label="Abrir menú">≡</button>
+        <span class="lbl ticket-ref" id="ticketRef">N° 0001 · 01·ENE·26</span>
+        <div style="width:16px"></div>
       </div>
-      <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema">
-        <i class="bi bi-moon-fill" id="themeIcon"></i>
-      </button>
-    </div>
-  </header>
 
-  <!-- ═══ MAIN ════════════════════════════════════════════════════ -->
-  <div class="scroll-area">
+      <div class="wordmark">LISTBUY</div>
+      <div class="wordmark-sub">—— LISTA DE COMPRAS ——</div>
+      <div class="lbl item-count-lbl" id="itemCountLbl">0 ITEMS · ABIERTA</div>
 
-    <!-- Lista de compras -->
-    <div class="card">
-      <h2 class="card-title">
-        <span class="ico"><i class="bi bi-cart3"></i></span>
-        Lista de Compras
-        <span class="badge-pill" id="countBadge">0</span>
-      </h2>
+      <!-- ── Separador ── -->
+      <div class="sep-dotted mx"></div>
 
-      <!-- Formulario -->
-      <div class="add-form">
-        <input
-          id="iName"
-          class="field"
-          type="text"
-          placeholder="Nombre del producto…"
-          maxlength="50"
-          autocomplete="off"
-          autocorrect="off"
-          spellcheck="false">
-        <div class="input-row">
-          <input
-            id="iPrice"
-            class="field"
-            type="number"
-            placeholder="Precio (opcional)"
-            min="0"
-            step="0.01"
-            inputmode="decimal">
-          <input
-            id="iQty"
-            class="field"
-            type="number"
-            placeholder="Cant. (defecto 1)"
-            min="1"
-            max="999"
-            inputmode="numeric">
+      <!-- Formulario de carga -->
+      <section class="add-section">
+        <div class="lbl add-label">+ NUEVO ITEM</div>
+        <input id="iName"  class="inp" type="text"   placeholder="producto…"  maxlength="50" autocomplete="off" autocorrect="off" spellcheck="false">
+        <div class="inp-grid">
+          <input id="iPrice" class="inp" type="number" placeholder="precio"     min="0"  step="1"   inputmode="numeric">
+          <input id="iQty"   class="inp" type="number" placeholder="cant."      min="1"  max="999"  inputmode="numeric">
         </div>
-        <button class="btn-add" onclick="addItem()">
-          <i class="bi bi-plus-lg"></i> Agregar producto
-        </button>
-      </div>
+        <button class="btn-primary" id="btnAdd">AGREGAR ›</button>
+      </section>
 
-      <!-- Items -->
-      <ul id="shoppingList">
-        <li class="empty-state" id="emptyState">
-          <i class="bi bi-cart3 ei"></i>
-          <p>Tu lista está vacía</p>
-          <small>Agregá productos arriba para empezar</small>
-        </li>
+      <!-- ── Separador ── -->
+      <div class="sep-dotted mx"></div>
+
+      <!-- Lista de productos -->
+      <ul class="item-list" id="itemList">
+        <li class="empty-list lbl" id="emptyList">— LISTA VACÍA —</li>
       </ul>
 
-      <!-- Total -->
-      <div class="total-bar" id="totalBar" hidden>
-        <div>
-          <div class="total-lbl">Total</div>
-          <div class="total-cnt" id="totalCnt"></div>
+      <!-- Totales + presupuesto -->
+      <div id="totalsBlock" hidden>
+        <div class="sep-dotted mx"></div>
+        <div class="subtotal-row mx">
+          <span class="lbl">SUBTOTAL · <span id="subtotalCount">0</span> ITEMS</span>
+          <span class="mono-num lbl" id="subtotalAmt">$0</span>
         </div>
-        <div class="total-amt" id="totalAmt">$0</div>
-      </div>
-
-      <!-- Generar ticket -->
-      <button class="btn-finalize" id="btnFinalize" hidden onclick="openSheet()">
-        <i class="bi bi-receipt-cutoff"></i> Generar Ticket
-      </button>
-    </div>
-
-  </div><!-- /scroll-area -->
-
-  <!-- ═══ TICKET SHEET ════════════════════════════════════════════ -->
-  <div class="overlay" id="overlay" onclick="overlayClick(event)">
-    <div class="sheet">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">🛒 Tu Ticket</div>
-      <pre class="ticket-box" id="ticketBox"></pre>
-      <button class="btn-wa" onclick="shareWA()">
-        <i class="bi bi-whatsapp" style="font-size:20px"></i>
-        Enviar por WhatsApp
-      </button>
-      <button class="btn-dismiss" onclick="closeSheet()">Cerrar</button>
-    </div>
-  </div>
-
-  <!-- ═══ EDIT SHEET ══════════════════════════════════════════════ -->
-  <div class="overlay" id="editOverlay" onclick="editOverlayClick(event)">
-    <div class="sheet">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">✏️ Editar producto</div>
-
-      <div class="edit-field-group">
-        <label class="edit-field-label" for="eName">Nombre</label>
-        <input
-          id="eName"
-          class="field"
-          type="text"
-          placeholder="Nombre del producto…"
-          maxlength="50"
-          autocomplete="off">
-      </div>
-
-      <div class="input-row" style="margin-bottom:14px">
-        <div>
-          <label class="edit-field-label" for="ePrice">Precio</label>
-          <input
-            id="ePrice"
-            class="field"
-            type="number"
-            placeholder="0.00"
-            min="0"
-            step="0.01"
-            inputmode="decimal">
+        <div class="sep-dotted mx"></div>
+        <div class="total-row mx">
+          <span class="total-lbl">TOTAL</span>
+          <span class="total-amt" id="totalAmt">$0</span>
         </div>
-        <div>
-          <label class="edit-field-label" for="eQty">Cantidad</label>
-          <input
-            id="eQty"
-            class="field"
-            type="number"
-            placeholder="1"
-            min="1"
-            max="999"
-            inputmode="numeric">
+        <div class="sep-solid mx"></div>
+
+        <div class="budget-wrap mx">
+          <div class="budget-header">
+            <span class="lbl">PRESUPUESTO MENSUAL</span>
+            <span class="lbl mono-num" id="budgetPct">0%</span>
+          </div>
+          <div class="budget-bar">
+            <div class="budget-fill" id="budgetFill" style="width:0%"></div>
+          </div>
+          <div class="budget-footer">
+            <span class="mono-num" id="budgetSpent"></span>
+            <span class="mono-num" id="budgetRemain"></span>
+          </div>
         </div>
       </div>
 
-      <button class="btn-add" onclick="saveEdit()">
-        <i class="bi bi-check-lg"></i> Guardar cambios
-      </button>
-      <button class="btn-dismiss" style="margin-top:10px" onclick="closeEditSheet()">Cancelar</button>
-    </div>
-  </div>
+      <!-- Botón compartir + pie decorativo -->
+      <div id="shareBlock" hidden>
+        <div class="share-section mx">
+          <button class="btn-outline" id="btnShare">ENVIAR POR WHATSAPP →</button>
+        </div>
+      </div>
 
-  <!-- ═══ TOAST ═══════════════════════════════════════════════════ -->
-  <div id="toast"></div>
+      <div class="receipt-footer lbl">★ ★ ★ GRACIAS POR USAR LISTBUY ★ ★ ★</div>
+
+    </div><!-- /receipt-scroll -->
+
+    <!-- Borde inferior dentado -->
+    <svg class="paper-edge paper-edge-flip" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,0 L0,3 L4,6 L8,3 L12,6 L16,3 L20,6 L24,3 L28,6 L32,3 L36,6 L40,3 L44,6 L48,3 L52,6 L56,3 L60,6 L64,3 L68,6 L72,3 L76,6 L80,3 L84,6 L88,3 L92,6 L96,3 L100,6 L100,0 Z"/>
+    </svg>
+
+    <!-- Toggle de tema (flotante) -->
+    <button class="btn-theme" id="btnTheme" aria-label="Cambiar tema">☾</button>
+
+    <!-- ══════════════════════════════════
+         OVERLAYS (absolutos en el wrapper)
+         ══════════════════════════════════ -->
+
+    <!-- Backdrop del menú -->
+    <div class="backdrop" id="menuBackdrop" aria-hidden="true"></div>
+
+    <!-- Drawer menú -->
+    <nav class="drawer" id="menuDrawer" aria-label="Navegación">
+      <div class="drawer-logo">LISTBUY</div>
+      <div class="lbl drawer-month" id="drawerMonth">mayo · 2026</div>
+      <div class="drawer-nav" id="drawerNav"></div>
+    </nav>
+
+    <!-- ── Historia ── -->
+    <div class="view-slide" id="viewHistory" aria-label="Historial de compras">
+      <div class="view-hdr">
+        <button class="btn-raw btn-back" onclick="closeView('viewHistory')">← Volver</button>
+        <span class="lbl">Historial</span>
+      </div>
+      <div class="view-body" id="historyBody"></div>
+    </div>
+
+    <!-- ── Presupuesto ── -->
+    <div class="view-slide" id="viewBudget" aria-label="Presupuesto mensual">
+      <div class="view-hdr">
+        <button class="btn-raw btn-back" onclick="closeView('viewBudget')">← Volver</button>
+        <span class="lbl" id="budgetViewTitle">Presupuesto · Mayo</span>
+      </div>
+      <div class="view-body" id="budgetBody"></div>
+    </div>
+
+    <!-- ── Comparar precios ── -->
+    <div class="view-slide" id="viewCompare" aria-label="Comparar precios">
+      <div class="view-hdr">
+        <button class="btn-raw btn-back" onclick="closeView('viewCompare')">← Volver</button>
+        <span class="lbl">Comparar precios</span>
+      </div>
+      <div class="view-body" id="compareBody"></div>
+    </div>
+
+    <!-- ── Modal compartir ── -->
+    <div class="modal-backdrop" id="shareBackdrop" aria-hidden="true"></div>
+    <div class="modal-center" id="shareModal" role="dialog" aria-modal="true" aria-label="Compartir lista" hidden>
+      <div class="modal-hdr">
+        <span class="lbl">Compartir lista</span>
+        <button class="btn-raw modal-close" id="btnCloseShare" aria-label="Cerrar">×</button>
+      </div>
+      <pre class="msg-preview" id="msgPreview"></pre>
+      <div class="lbl" style="margin-bottom:10px">Enviar a</div>
+      <div id="contactsList"></div>
+      <div class="modal-actions">
+        <button class="btn-outline flex-1" id="btnCopy">Copiar texto</button>
+        <button class="btn-primary flex-2" id="btnOpenWA">Abrir WhatsApp →</button>
+      </div>
+      <div class="sep-dotted" style="margin:16px 0"></div>
+      <div class="lbl" style="margin-bottom:8px; opacity:.55">ARCHIVAR ESTA COMPRA</div>
+      <input id="archiveStore" class="inp" type="text" placeholder="Nombre del local…" autocomplete="off">
+      <button class="btn-outline" id="btnArchive" style="margin-top:10px; width:100%">GUARDAR COMO COMPRA REALIZADA</button>
+    </div>
+
+    <!-- ── Modal editar item ── -->
+    <div class="modal-backdrop" id="editBackdrop" aria-hidden="true"></div>
+    <div class="edit-sheet" id="editSheet" role="dialog" aria-modal="true" aria-label="Editar producto" hidden>
+      <div class="lbl" style="margin-bottom:16px; opacity:.55">EDITAR ITEM</div>
+      <input id="eName"  class="inp" type="text"   placeholder="nombre…"  maxlength="50" autocomplete="off">
+      <div class="inp-grid" style="margin-top:0; margin-bottom:16px">
+        <input id="ePrice" class="inp" type="number" placeholder="precio"  min="0" step="1"  inputmode="numeric">
+        <input id="eQty"   class="inp" type="number" placeholder="cant."   min="1" max="999" inputmode="numeric">
+      </div>
+      <button class="btn-primary" id="btnSaveEdit">GUARDAR</button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" aria-live="polite"></div>
+
+  </div><!-- /receipt-wrapper -->
 
   <script src="app.js"></script>
 </body>
