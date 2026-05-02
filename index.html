@@ -23,7 +23,7 @@
     <div class="splash-content">
       <div class="wordmark" style="font-size:32px; margin-bottom:40px;">LISTBUY</div>
 
-      <div id="splashLoading" class="lbl" style="opacity:0.6; margin-bottom:16px;">CARGANDO...</div>
+      <div id="splashLoading" class="lbl" style="opacity:0.6; margin-bottom:16px;" data-i18n="loading">CARGANDO...</div>
 
       <div id="authActions" hidden>
         <button class="btn-primary" style="margin-bottom:12px; background:#fff; color:#000;" onclick="signInGoogle()">
@@ -37,44 +37,42 @@
             <path fill="#EA4335"
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
-          Continuar con Google
+          <span data-i18n="btn_google">Continuar con Google</span>
         </button>
-        <button class="btn-outline" style="margin-bottom:12px;" onclick="showEmailForm()">
+        <button class="btn-outline" style="margin-bottom:12px;" onclick="showEmailForm()" data-i18n="btn_email">
           Correo y Contraseña
         </button>
-        <button class="btn-outline" onclick="showGuestForm()">
+        <button class="btn-outline" onclick="showGuestForm()" data-i18n="btn_guest">
           Continuar sin conectarse
         </button>
       </div>
 
       <div id="emailForm" hidden>
-        <div class="lbl" style="margin-bottom:8px;">CORREO ELECTRÓNICO</div>
-        <input type="email" id="emailInput" class="inp" placeholder="tu@correo.com"
+        <div class="lbl" style="margin-bottom:8px;" data-i18n="lbl_email">CORREO ELECTRÓNICO</div>
+        <input type="email" id="emailInput" class="inp" placeholder="tu@correo.com" data-i18n-plc="plc_email"
           style="margin-bottom:12px; text-align:center;">
-        <div class="lbl" style="margin-bottom:8px;">CONTRASEÑA</div>
-        <input type="password" id="passwordInput" class="inp" placeholder="******"
+        <div class="lbl" style="margin-bottom:8px;" data-i18n="lbl_password">CONTRASEÑA</div>
+        <input type="password" id="passwordInput" class="inp" placeholder="******" data-i18n-plc="plc_password"
           style="margin-bottom:16px; text-align:center;">
         <div style="display:flex; gap:8px;">
-          <button class="btn-primary" style="flex:1" onclick="signInEmail('login')">ENTRAR</button>
-          <button class="btn-outline" style="flex:1" onclick="signInEmail('register')">CREAR</button>
+          <button class="btn-primary" style="flex:1" onclick="signInEmail('login')" data-i18n="btn_login">ENTRAR</button>
+          <button class="btn-outline" style="flex:1" onclick="signInEmail('register')" data-i18n="btn_register">CREAR</button>
         </div>
-        <button class="btn-raw" style="margin-top:16px; opacity:0.6; font-size:11px;" onclick="hideEmailForm()">←
-          Volver</button>
+        <button class="btn-raw" style="margin-top:16px; opacity:0.6; font-size:11px;" onclick="hideEmailForm()" data-i18n="btn_back">← Volver</button>
       </div>
 
       <div id="guestForm" hidden>
-        <div class="lbl" style="margin-bottom:8px;">TU NOMBRE</div>
-        <input type="text" id="guestNameInput" class="inp" placeholder="ej: Manuel"
+        <div class="lbl" style="margin-bottom:8px;" data-i18n="lbl_name">TU NOMBRE</div>
+        <input type="text" id="guestNameInput" class="inp" placeholder="ej: Manuel" data-i18n-plc="plc_name"
           style="margin-bottom:16px; text-align:center;" onkeydown="if(event.key==='Enter') signInGuest()">
-        <button class="btn-primary" onclick="signInGuest()">ENTRAR ANÓNIMO</button>
-        <button class="btn-raw" style="margin-top:16px; opacity:0.6; font-size:11px;" onclick="hideGuestForm()">←
-          Volver</button>
+        <button class="btn-primary" onclick="signInGuest()" data-i18n="btn_login_anon">ENTRAR ANÓNIMO</button>
+        <button class="btn-raw" style="margin-top:16px; opacity:0.6; font-size:11px;" onclick="hideGuestForm()" data-i18n="btn_back">← Volver</button>
       </div>
     </div>
   </div>
 
   <div class="receipt-wrapper">
-    <div id="offlineBanner" class="offline-banner" hidden>SIN CONEXIÓN</div>
+    <div id="offlineBanner" class="offline-banner" hidden data-i18n="offline_banner">SIN CONEXIÓN</div>
 
     <!-- Borde superior dentado -->
     <svg class="paper-edge" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
@@ -93,7 +91,7 @@
       </div>
 
       <div class="wordmark">LISTBUY</div>
-      <div class="wordmark-sub">—— LISTA DE COMPRAS ——</div>
+      <div class="wordmark-sub" data-i18n="receipt_title">—— LISTA DE COMPRAS ——</div>
       <div class="lbl item-count-lbl" id="itemCountLbl">0 ITEMS · ABIERTA</div>
 
       <!-- ── Separador ── -->
@@ -101,21 +99,21 @@
 
       <!-- Formulario de carga -->
       <section class="add-section">
-        <div class="lbl add-label">+ NUEVO ITEM</div>
+        <div class="lbl add-label" data-i18n="lbl_add_item">+ NUEVO ITEM</div>
         <div class="autocomplete-wrap">
-          <input id="iName" class="inp" type="text" placeholder="producto…" maxlength="50" autocomplete="off"
+          <input id="iName" class="inp" type="text" placeholder="producto…" data-i18n-plc="plc_item_name" maxlength="50" autocomplete="off"
             autocorrect="off" spellcheck="false">
           <div id="autoMenu" class="autocomplete-menu" hidden></div>
         </div>
         <div class="inp-grid">
           <div class="price-input-wrap">
             <span class="price-prefix">$</span>
-            <input id="iPrice" class="inp has-prefix" type="text" placeholder="precio" inputmode="decimal"
+            <input id="iPrice" class="inp has-prefix" type="text" placeholder="precio" data-i18n-plc="plc_item_price" inputmode="decimal"
               autocomplete="off">
           </div>
-          <input id="iQty" class="inp" type="number" placeholder="cant." min="1" max="999" inputmode="numeric">
+          <input id="iQty" class="inp" type="number" placeholder="cant." data-i18n-plc="plc_item_qty" min="1" max="999" inputmode="numeric">
         </div>
-        <button class="btn-primary" id="btnAdd">AGREGAR ›</button>
+        <button class="btn-primary" id="btnAdd" data-i18n="btn_add">AGREGAR ›</button>
       </section>
 
       <!-- ── Separador ── -->
@@ -123,18 +121,18 @@
 
       <!-- Lista de productos -->
       <ul class="item-list" id="itemList">
-        <li class="empty-list lbl" id="emptyList">— LISTA VACÍA —</li>
+        <li class="empty-list lbl" id="emptyList" data-i18n="empty_list">— LISTA VACÍA —</li>
       </ul>
 
       <!-- Totales + presupuesto -->
       <div id="totalsBlock" hidden>
         <div class="sep-dotted mx"></div>
         <div class="subtotal-row mx">
-          <span class="lbl">SUBTOTAL · <span id="subtotalCount">0</span> ITEMS</span>
+          <span class="lbl"><span data-i18n="lbl_subtotal">SUBTOTAL</span> · <span id="subtotalCount">0</span> <span data-i18n="lbl_items">ITEMS</span></span>
           <span class="mono-num lbl" id="subtotalAmt">$0</span>
         </div>
         <div class="discount-row mx">
-          <span class="lbl">DESCUENTO</span>
+          <span class="lbl" data-i18n="lbl_discount">DESCUENTO</span>
           <div class="discount-input-wrap">
             <span class="lbl" style="margin-right:4px;">-</span>
             <input id="iDiscount" type="number" min="0" max="100" placeholder="0" class="inp discount-inp"
@@ -144,14 +142,14 @@
         </div>
         <div class="sep-dotted mx"></div>
         <div class="total-row mx">
-          <span class="total-lbl">TOTAL</span>
+          <span class="total-lbl" data-i18n="lbl_total">TOTAL</span>
           <span class="total-amt" id="totalAmt">$0</span>
         </div>
         <div class="sep-solid mx"></div>
 
         <div class="budget-wrap mx">
           <div class="budget-header">
-            <span class="lbl">PRESUPUESTO MENSUAL</span>
+            <span class="lbl" data-i18n="lbl_budget">PRESUPUESTO MENSUAL</span>
             <span class="lbl mono-num" id="budgetPct">0%</span>
           </div>
           <div class="budget-bar">
@@ -167,11 +165,11 @@
       <!-- Botón terminar compra + pie decorativo -->
       <div id="shareBlock" hidden>
         <div class="share-section mx">
-          <button class="btn-primary" id="btnShare">TERMINAR COMPRA</button>
+          <button class="btn-primary" id="btnShare" data-i18n="btn_finish">TERMINAR COMPRA</button>
         </div>
       </div>
 
-      <div class="receipt-footer lbl">★ ★ ★ GRACIAS POR USAR LISTBUY ★ ★ ★</div>
+      <div class="receipt-footer lbl" data-i18n="receipt_footer">★ ★ ★ GRACIAS POR USAR LISTBUY ★ ★ ★</div>
 
     </div><!-- /receipt-scroll -->
 
@@ -200,16 +198,53 @@
       <div class="drawer-nav" id="drawerNav"></div>
 
       <div style="margin-top:auto; padding-top:20px;">
+        <button class="btn-outline" onclick="openView('viewSettings'); closeDrawer();"
+          style="font-size:9px; padding:8px 0; margin-bottom: 8px; opacity:0.8;" data-i18n="btn_settings">Configuración</button>
         <button class="btn-outline" onclick="signOut()"
-          style="font-size:9px; padding:8px 0; opacity:0.5; border-style:dashed;">Cerrar sesión</button>
+          style="font-size:9px; padding:8px 0; opacity:0.5; border-style:dashed;" data-i18n="btn_logout">Cerrar sesión</button>
       </div>
     </nav>
+
+    <!-- ── Configuración ── -->
+    <div class="view-slide" id="viewSettings" aria-label="Configuración">
+      <div class="view-hdr">
+        <button class="btn-raw btn-back" onclick="closeView('viewSettings')" data-i18n="btn_back">← Volver</button>
+        <span class="lbl" data-i18n="settings_title">Ajustes</span>
+      </div>
+      <div class="view-body" id="settingsBody">
+        <div class="lbl" style="margin-bottom:8px; opacity:0.6;" data-i18n="lbl_language">IDIOMA</div>
+        <select class="inp" id="langSelect" onchange="setLanguage(this.value)" style="margin-bottom: 24px; width: 100%; text-align: left; appearance: auto; cursor: pointer;">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+
+        <div class="lbl" style="margin-bottom:8px; opacity:0.6;" data-i18n="lbl_currency">MONEDA</div>
+        <select class="inp" id="currencySelect" onchange="setCurrency(this.value)" style="margin-bottom: 24px; width: 100%; text-align: left; appearance: auto; cursor: pointer;">
+          <option value="$">$ (ARS, USD, CLP, COP)</option>
+          <option value="€">€ (Euro)</option>
+          <option value="£">£ (Libra)</option>
+          <option value="R$">R$ (Real)</option>
+        </select>
+
+        <div class="lbl" style="margin-bottom:8px; opacity:0.6;" data-i18n="lbl_theme">TEMA VISUAL</div>
+        <div style="display:flex; gap:8px; margin-bottom:32px;">
+          <button class="btn-outline" style="flex:1" onclick="applyTheme('light')" id="btnThemeLight"><span data-i18n="theme_light">Claro</span></button>
+          <button class="btn-outline" style="flex:1" onclick="applyTheme('dark')" id="btnThemeDark"><span data-i18n="theme_dark">Oscuro</span></button>
+        </div>
+
+        <button class="btn-outline" onclick="if(confirm(t('confirm_del_history'))){ localStorage.clear(); window.location.reload(); }" style="color:var(--color-del); border-color:var(--color-del); width:100%;" data-i18n="btn_clear_cache">BORRAR CACHÉ LOCAL</button>
+      </div>
+    </div>
 
     <!-- ── Historia ── -->
     <div class="view-slide" id="viewHistory" aria-label="Historial de compras">
       <div class="view-hdr">
-        <button class="btn-raw btn-back" onclick="closeView('viewHistory')">← Volver</button>
-        <span class="lbl">Historial</span>
+        <button class="btn-raw btn-back" onclick="closeView('viewHistory')" data-i18n="btn_back">← Volver</button>
+        <span class="lbl" data-i18n="title_history">Historial</span>
       </div>
       <div class="view-body" id="historyBody"></div>
     </div>
@@ -217,8 +252,8 @@
     <!-- ── Presupuesto ── -->
     <div class="view-slide" id="viewBudget" aria-label="Presupuesto mensual">
       <div class="view-hdr">
-        <button class="btn-raw btn-back" onclick="closeView('viewBudget')">← Volver</button>
-        <span class="lbl" id="budgetViewTitle">Presupuesto · Mayo</span>
+        <button class="btn-raw btn-back" onclick="closeView('viewBudget')" data-i18n="btn_back">← Volver</button>
+        <span class="lbl" id="budgetViewTitle" data-i18n="title_budget">Presupuesto</span>
       </div>
       <div class="view-body" id="budgetBody"></div>
     </div>
@@ -226,8 +261,8 @@
     <!-- ── Comparar precios ── -->
     <div class="view-slide" id="viewCompare" aria-label="Comparar precios">
       <div class="view-hdr">
-        <button class="btn-raw btn-back" onclick="closeView('viewCompare')">← Volver</button>
-        <span class="lbl">Comparar precios</span>
+        <button class="btn-raw btn-back" onclick="closeView('viewCompare')" data-i18n="btn_back">← Volver</button>
+        <span class="lbl" data-i18n="title_compare">Comparar precios</span>
       </div>
       <div class="view-body" id="compareBody"></div>
     </div>
@@ -236,23 +271,23 @@
     <div class="modal-backdrop" id="shareBackdrop" aria-hidden="true"></div>
     <div class="modal-center" id="shareModal" role="dialog" aria-modal="true" aria-label="Terminar compra" hidden>
       <div class="modal-hdr">
-        <span class="lbl">Tu ticket</span>
+        <span class="lbl" data-i18n="title_ticket">Tu ticket</span>
         <button class="btn-raw modal-close" id="btnCloseShare" aria-label="Cerrar">×</button>
       </div>
 
       <pre class="msg-preview" id="msgPreview"></pre>
 
       <div class="modal-actions">
-        <button class="btn-outline flex-1" id="btnCopy">Copiar</button>
-        <button class="btn-primary flex-2" id="btnOpenWA">WhatsApp →</button>
+        <button class="btn-outline flex-1" id="btnCopy" data-i18n="btn_copy">Copiar</button>
+        <button class="btn-primary flex-2" id="btnOpenWA" data-i18n="btn_whatsapp">WhatsApp →</button>
       </div>
 
       <div class="sep-dotted" style="margin:18px 0 14px"></div>
 
-      <div class="lbl" style="margin-bottom:8px; opacity:.55">ARCHIVAR COMPRA</div>
-      <input id="archiveStore" class="inp" type="text" placeholder="Nombre del local (ej: Coto, Disco…)"
+      <div class="lbl" style="margin-bottom:8px; opacity:.55" data-i18n="lbl_archive">ARCHIVAR COMPRA</div>
+      <input id="archiveStore" class="inp" type="text" placeholder="Nombre del local (ej: Coto, Disco…)" data-i18n-plc="plc_store"
         autocomplete="off">
-      <button class="btn-outline" id="btnArchive" style="margin-top:12px; width:100%">
+      <button class="btn-outline" id="btnArchive" style="margin-top:12px; width:100%" data-i18n="btn_save_history">
         GUARDAR EN HISTORIAL
       </button>
     </div>
@@ -260,16 +295,16 @@
     <!-- ── Modal editar item ── -->
     <div class="modal-backdrop" id="editBackdrop" aria-hidden="true"></div>
     <div class="edit-sheet" id="editSheet" role="dialog" aria-modal="true" aria-label="Editar producto" hidden>
-      <div class="lbl" style="margin-bottom:16px; opacity:.55">EDITAR ITEM</div>
-      <input id="eName" class="inp" type="text" placeholder="nombre…" maxlength="50" autocomplete="off">
+      <div class="lbl" style="margin-bottom:16px; opacity:.55" data-i18n="lbl_edit_item">EDITAR ITEM</div>
+      <input id="eName" class="inp" type="text" placeholder="nombre…" data-i18n-plc="plc_item_name" maxlength="50" autocomplete="off">
       <div class="inp-grid" style="margin-top:0; margin-bottom:16px">
         <div class="price-input-wrap">
           <span class="price-prefix">$</span>
-          <input id="ePrice" class="inp has-prefix" type="text" placeholder="precio" inputmode="decimal">
+          <input id="ePrice" class="inp has-prefix" type="text" placeholder="precio" data-i18n-plc="plc_item_price" inputmode="decimal">
         </div>
-        <input id="eQty" class="inp" type="number" placeholder="cant." min="1" max="999" inputmode="numeric">
+        <input id="eQty" class="inp" type="number" placeholder="cant." data-i18n-plc="plc_item_qty" min="1" max="999" inputmode="numeric">
       </div>
-      <button class="btn-primary" id="btnSaveEdit">GUARDAR</button>
+      <button class="btn-primary" id="btnSaveEdit" data-i18n="btn_save">GUARDAR</button>
     </div>
 
     <div class="toast" id="toast" aria-live="polite"></div>
@@ -285,6 +320,7 @@
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="lang.js"></script>
   <script src="app.js"></script>
 </body>
 
