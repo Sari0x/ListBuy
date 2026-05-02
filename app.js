@@ -4,7 +4,7 @@
    FIREBASE INIT & AUTH
 ═══════════════════════════════════════════════════════════════ */
 firebase.initializeApp({
-  apiKey: "AIzaSyCJa9SHF0buYkLe_X9JTw9KABwacI_LuGo",
+  apiKey: "AIzaSyCJa9SHFObuYkLe_X9JTw9KABwacI_LuGo",
   authDomain: "listbuy-45c65.firebaseapp.com",
   databaseURL: "https://listbuy-45c65-default-rtdb.firebaseio.com",
   projectId: "listbuy-45c65",
