@@ -1,0 +1,17 @@
+{
+  "name": "ListBuy",
+  "short_name": "ListBuy",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fafaf7",
+  "theme_color": "#fafaf7",
+  "description": "Lista de compras con historial y presupuesto.",
+  "icons": [
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Shop_icon.svg/512px-Shop_icon.svg.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

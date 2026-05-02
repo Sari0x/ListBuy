@@ -13,11 +13,68 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
 
+  <!-- SPLASH SCREEN / LOGIN -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <div class="wordmark" style="font-size:32px; margin-bottom:40px;">LISTBUY</div>
+
+      <div id="splashLoading" class="lbl" style="opacity:0.6; margin-bottom:16px;">CARGANDO...</div>
+
+      <div id="authActions" hidden>
+        <button class="btn-primary" style="margin-bottom:12px; background:#fff; color:#000;" onclick="signInGoogle()">
+          <svg style="width:16px; height:16px; margin-right:8px; vertical-align:middle" viewBox="0 0 24 24">
+            <path fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+            <path fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+            <path fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+            <path fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+          </svg>
+          Continuar con Google
+        </button>
+        <button class="btn-outline" style="margin-bottom:12px;" onclick="showEmailForm()">
+          Correo y Contraseña
+        </button>
+        <button class="btn-outline" onclick="showGuestForm()">
+          Continuar sin conectarse
+        </button>
+      </div>
+
+      <div id="emailForm" hidden>
+        <div class="lbl" style="margin-bottom:8px;">CORREO ELECTRÓNICO</div>
+        <input type="email" id="emailInput" class="inp" placeholder="tu@correo.com"
+          style="margin-bottom:12px; text-align:center;">
+        <div class="lbl" style="margin-bottom:8px;">CONTRASEÑA</div>
+        <input type="password" id="passwordInput" class="inp" placeholder="******"
+          style="margin-bottom:16px; text-align:center;">
+        <div style="display:flex; gap:8px;">
+          <button class="btn-primary" style="flex:1" onclick="signInEmail('login')">ENTRAR</button>
+          <button class="btn-outline" style="flex:1" onclick="signInEmail('register')">CREAR</button>
+        </div>
+        <button class="btn-raw" style="margin-top:16px; opacity:0.6; font-size:11px;" onclick="hideEmailForm()">←
+          Volver</button>
+      </div>
+
+      <div id="guestForm" hidden>
+        <div class="lbl" style="margin-bottom:8px;">TU NOMBRE</div>
+        <input type="text" id="guestNameInput" class="inp" placeholder="ej: Manuel"
+          style="margin-bottom:16px; text-align:center;" onkeydown="if(event.key==='Enter') signInGuest()">
+        <button class="btn-primary" onclick="signInGuest()">ENTRAR ANÓNIMO</button>
+        <button class="btn-raw" style="margin-top:16px; opacity:0.6; font-size:11px;" onclick="hideGuestForm()">←
+          Volver</button>
+      </div>
+    </div>
+  </div>
+
   <div class="receipt-wrapper">
+    <div id="offlineBanner" class="offline-banner" hidden>SIN CONEXIÓN</div>
 
     <!-- Borde superior dentado -->
     <svg class="paper-edge" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
@@ -45,10 +102,17 @@
       <!-- Formulario de carga -->
       <section class="add-section">
         <div class="lbl add-label">+ NUEVO ITEM</div>
-        <input id="iName" class="inp" type="text" placeholder="producto…" maxlength="50" autocomplete="off"
-          autocorrect="off" spellcheck="false">
+        <div class="autocomplete-wrap">
+          <input id="iName" class="inp" type="text" placeholder="producto…" maxlength="50" autocomplete="off"
+            autocorrect="off" spellcheck="false">
+          <div id="autoMenu" class="autocomplete-menu" hidden></div>
+        </div>
         <div class="inp-grid">
-          <input id="iPrice" class="inp" type="text" placeholder="precio" inputmode="decimal" autocomplete="off">
+          <div class="price-input-wrap">
+            <span class="price-prefix">$</span>
+            <input id="iPrice" class="inp has-prefix" type="text" placeholder="precio" inputmode="decimal"
+              autocomplete="off">
+          </div>
           <input id="iQty" class="inp" type="number" placeholder="cant." min="1" max="999" inputmode="numeric">
         </div>
         <button class="btn-primary" id="btnAdd">AGREGAR ›</button>
@@ -68,6 +132,15 @@
         <div class="subtotal-row mx">
           <span class="lbl">SUBTOTAL · <span id="subtotalCount">0</span> ITEMS</span>
           <span class="mono-num lbl" id="subtotalAmt">$0</span>
+        </div>
+        <div class="discount-row mx">
+          <span class="lbl">DESCUENTO</span>
+          <div class="discount-input-wrap">
+            <span class="lbl" style="margin-right:4px;">-</span>
+            <input id="iDiscount" type="number" min="0" max="100" placeholder="0" class="inp discount-inp"
+              inputmode="numeric">
+            <span class="lbl" style="margin-left:4px;">%</span>
+          </div>
         </div>
         <div class="sep-dotted mx"></div>
         <div class="total-row mx">
@@ -121,8 +194,15 @@
     <!-- Drawer menú -->
     <nav class="drawer" id="menuDrawer" aria-label="Navegación">
       <div class="drawer-logo">LISTBUY</div>
+      <div class="lbl drawer-month" id="drawerProfileName"
+        style="margin-bottom:4px; opacity:1; color:var(--color-edit);"></div>
       <div class="lbl drawer-month" id="drawerMonth">mayo · 2026</div>
       <div class="drawer-nav" id="drawerNav"></div>
+
+      <div style="margin-top:auto; padding-top:20px;">
+        <button class="btn-outline" onclick="signOut()"
+          style="font-size:9px; padding:8px 0; opacity:0.5; border-style:dashed;">Cerrar sesión</button>
+      </div>
     </nav>
 
     <!-- ── Historia ── -->
@@ -183,17 +263,28 @@
       <div class="lbl" style="margin-bottom:16px; opacity:.55">EDITAR ITEM</div>
       <input id="eName" class="inp" type="text" placeholder="nombre…" maxlength="50" autocomplete="off">
       <div class="inp-grid" style="margin-top:0; margin-bottom:16px">
-        <input id="ePrice" class="inp" type="number" placeholder="precio" min="0" step="1" inputmode="numeric">
+        <div class="price-input-wrap">
+          <span class="price-prefix">$</span>
+          <input id="ePrice" class="inp has-prefix" type="text" placeholder="precio" inputmode="decimal">
+        </div>
         <input id="eQty" class="inp" type="number" placeholder="cant." min="1" max="999" inputmode="numeric">
       </div>
       <button class="btn-primary" id="btnSaveEdit">GUARDAR</button>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast" aria-live="polite"></div>
 
   </div><!-- /receipt-wrapper -->
 
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => { });
+      });
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="app.js"></script>
 </body>
 

@@ -1,14 +1,129 @@
 'use strict';
 
 /* ═══════════════════════════════════════════════════════════════
-   FIREBASE — lista en tiempo real
+   FIREBASE INIT & AUTH
 ═══════════════════════════════════════════════════════════════ */
-const FB_REF         = 'https://listbuy-45c65-default-rtdb.firebaseio.com/shoppingList';
-const FB_HISTORY_REF = 'https://listbuy-45c65-default-rtdb.firebaseio.com/history';
+firebase.initializeApp({
+  apiKey: "AIzaSyCJa9SHF0buYkLe_X9JTw9KABwacI_LuGo",
+  authDomain: "listbuy-45c65.firebaseapp.com",
+  databaseURL: "https://listbuy-45c65-default-rtdb.firebaseio.com",
+  projectId: "listbuy-45c65",
+  storageBucket: "listbuy-45c65.firebasestorage.app",
+  messagingSenderId: "392764188596",
+  appId: "1:392764188596:web:a121a579fa485b605d34e1",
+  measurementId: "G-L58VY3H4Y7"
+});
 
-let items    = {};
+let FB_BASE = '';
+let FB_REF = '';
+let FB_HISTORY_REF = '';
+let FB_BUDGET_REF = '';
+let FB_DISCOUNT_REF = '';
+
+let items = {};
 let knownIds = new Set();
 let sse;
+
+firebase.auth().onAuthStateChanged(user => {
+  const guestData = JSON.parse(localStorage.getItem('lb_guest') || 'null');
+  
+  if (user) {
+    setupUserEnv(user.uid, user.displayName || user.email || 'Anónimo');
+  } else if (guestData) {
+    setupUserEnv(guestData.id, guestData.name + ' (Invitado)');
+  } else {
+    // Si no hay lb_guest pero sí hay lb_uuid antiguo, auto-migrarlo a invitado
+    const oldUUID = localStorage.getItem('lb_uuid');
+    if (oldUUID && !oldUUID.startsWith('guest_')) {
+      localStorage.setItem('lb_guest', JSON.stringify({ name: 'Anónimo', id: oldUUID }));
+      setupUserEnv(oldUUID, 'Anónimo (Invitado)');
+    } else {
+      document.getElementById('splashScreen').style.display = 'flex';
+      const loading = document.getElementById('splashLoading');
+      if (loading) loading.hidden = true;
+      const actions = document.getElementById('authActions');
+      if (actions) actions.hidden = false;
+    }
+  }
+});
+
+function setupUserEnv(userId, displayName) {
+  const splash = document.getElementById('splashScreen');
+  if (splash) {
+    splash.classList.add('fade-out');
+    setTimeout(() => splash.style.display = 'none', 300);
+  }
+  
+  FB_BASE = `https://listbuy-45c65-default-rtdb.firebaseio.com/users/${userId}`;
+  FB_REF = `${FB_BASE}/shoppingList`;
+  FB_HISTORY_REF = `${FB_BASE}/history`;
+  FB_BUDGET_REF = `${FB_BASE}/budget`;
+  FB_DISCOUNT_REF = `${FB_BASE}/discount`;
+
+  const profileName = document.getElementById('drawerProfileName');
+  if (profileName) profileName.textContent = displayName;
+
+  fetchHistory();
+  fetchBudget();
+  fetchDiscount();
+  connectSSE();
+}
+
+function signInGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).catch(err => alert('Error: ' + err.message));
+}
+
+function showEmailForm() {
+  document.getElementById('authActions').hidden = true;
+  document.getElementById('emailForm').hidden = false;
+  setTimeout(() => document.getElementById('emailInput').focus(), 100);
+}
+function hideEmailForm() {
+  document.getElementById('authActions').hidden = false;
+  document.getElementById('emailForm').hidden = true;
+}
+function signInEmail(mode) {
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passwordInput').value.trim();
+  if (!email || !pass) return alert('Completa correo y contraseña');
+  
+  if (mode === 'login') {
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .catch(err => alert('Error: ' + err.message));
+  } else {
+    firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .catch(err => alert('Error al registrar: ' + err.message));
+  }
+}
+
+function showGuestForm() {
+  document.getElementById('authActions').hidden = true;
+  document.getElementById('guestForm').hidden = false;
+  setTimeout(() => document.getElementById('guestNameInput').focus(), 100);
+}
+function hideGuestForm() {
+  document.getElementById('authActions').hidden = false;
+  document.getElementById('guestForm').hidden = true;
+}
+function signInGuest() {
+  const name = document.getElementById('guestNameInput').value.trim() || 'Invitado';
+  firebase.auth().signInAnonymously()
+    .then((result) => {
+      return result.user.updateProfile({ displayName: name + ' (Invitado)' }).then(() => {
+        const profileName = document.getElementById('drawerProfileName');
+        if (profileName) profileName.textContent = result.user.displayName;
+      });
+    })
+    .catch(err => alert('Error: ' + err.message));
+}
+
+function signOut() {
+  firebase.auth().signOut().then(() => {
+    localStorage.removeItem('lb_guest');
+    location.reload();
+  });
+}
 
 function connectSSE() {
   try {
@@ -38,9 +153,30 @@ function connectSSE() {
     });
 
     sse.addEventListener('keep-alive', () => {});
-    sse.onerror = () => { sse.close(); setTimeout(connectSSE, 5000); };
-  } catch (_) { setTimeout(connectSSE, 5000); }
+    sse.onerror = () => { 
+      sse.close(); 
+      if (navigator.onLine) setTimeout(connectSSE, 5000); 
+    };
+  } catch (_) { 
+    if (navigator.onLine) setTimeout(connectSSE, 5000); 
+  }
 }
+
+function updateOnlineStatus() {
+  const banner = document.getElementById('offlineBanner');
+  if (navigator.onLine) {
+    banner.hidden = true;
+    if (!sse || sse.readyState === EventSource.CLOSED) {
+      connectSSE();
+    }
+  } else {
+    banner.hidden = false;
+  }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
 
 async function fbPost(body) {
   const r = await fetch(FB_REF + '.json', {
@@ -82,6 +218,38 @@ async function fetchHistory() {
   }
 }
 
+async function fbBudgetPut(amount) {
+  try {
+    await fetch(FB_BUDGET_REF + '.json', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(amount),
+    });
+  } catch (_) {}
+}
+
+async function fetchBudget() {
+  try {
+    const r = await fetch(FB_BUDGET_REF + '.json');
+    const data = await r.json();
+    if (typeof data === 'number') { extra.budget = data; saveExtra(); }
+  } catch (_) {}
+}
+
+async function fbDiscountPut(pct) {
+  try {
+    await fetch(FB_DISCOUNT_REF + '.json', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pct),
+    });
+  } catch (_) {}
+}
+
+async function fetchDiscount() {
+  try {
+    const r = await fetch(FB_DISCOUNT_REF + '.json');
+    const data = await r.json();
+    if (typeof data === 'number') { extra.discount = data; saveExtra(); }
+  } catch (_) {}
+}
+
 /* ═══════════════════════════════════════════════════════════════
    ESTADO LOCAL  (historial cacheado, presupuesto)
 ═══════════════════════════════════════════════════════════════ */
@@ -93,12 +261,11 @@ function loadExtra() {
     const raw = localStorage.getItem(LB_KEY);
     if (raw) {
       const p = JSON.parse(raw);
-      /* migración: si la versión no coincide, resetear historial */
-      if (p._v === LB_VERSION) return p;
-      return { history: [], budget: p.budget || 120000, _v: LB_VERSION };
+      if (p._v === LB_VERSION) return { discount: 0, ...p };
+      return { history: [], budget: p.budget || 120000, discount: 0, _v: LB_VERSION };
     }
   } catch (_) {}
-  return { history: [], budget: 120000, _v: LB_VERSION };
+  return { history: [], budget: 120000, discount: 0, _v: LB_VERSION };
 }
 function saveExtra() {
   try { localStorage.setItem(LB_KEY, JSON.stringify({ ...extra, _v: LB_VERSION })); } catch (_) {}
@@ -107,6 +274,12 @@ function saveExtra() {
 let extra = loadExtra();
 
 /* ── Helpers de estado ── */
+function parsePrice(val) {
+  if (!val) return 0;
+  const parsed = parseFloat(String(val).replace(',', '.'));
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 function calcCurrentTotal() {
   return Object.values(items).reduce((s, it) => s + (it.price || 0) * (it.quantity || it.qty || 1), 0);
 }
@@ -158,9 +331,10 @@ function esc(s) {
 }
 
 let toastTimer;
-function toast(msg) {
+function toast(msg, html = false) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
+  if (html) el.innerHTML = msg;
+  else el.textContent = msg;
   el.classList.add('in');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('in'), 2200);
@@ -203,16 +377,46 @@ async function addItem() {
     toast('Ingresá el nombre del producto');
     return;
   }
-  await fbPost({
-    name,
-    price:    Math.max(0, parseFloat(pEl.value) || 0),
-    quantity: Math.max(1, parseInt(qEl.value)   || 1),
-    checked:  false,
-    ts:       Date.now(),
-  });
-  nEl.value = ''; pEl.value = ''; qEl.value = '';
-  nEl.focus();
-  toast('¡Producto agregado!');
+  const btn = document.getElementById('btnAdd');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  const priceVal = Math.max(0, parsePrice(pEl.value));
+  const qtyVal = Math.max(1, parseInt(qEl.value) || 1);
+
+  /* Haptics y alerta de presupuesto */
+  const currentTotal = calcCurrentTotal();
+  const oldFinal = currentTotal * (1 - (extra.discount || 0) / 100);
+  const newFinal = (currentTotal + priceVal * qtyVal) * (1 - (extra.discount || 0) / 100);
+  const spent = spentThisMonth();
+  
+  if (extra.budget > 0 && spent + newFinal > extra.budget && spent + oldFinal <= extra.budget) {
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    const bw = document.querySelector('.budget-wrap');
+    if (bw) {
+      bw.classList.remove('budget-warning');
+      void bw.offsetWidth;
+      bw.classList.add('budget-warning');
+    }
+  }
+
+  try {
+    await fbPost({
+      name,
+      price: priceVal,
+      quantity: qtyVal,
+      checked:  false,
+      ts:       Date.now(),
+    });
+    nEl.value = ''; pEl.value = ''; qEl.value = '';
+    nEl.focus();
+    toast('¡Producto agregado!');
+  } catch (_) {
+    toast('Error al agregar');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'AGREGAR ›';
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -222,10 +426,39 @@ async function toggleItem(id) {
   if (!items[id]) return;
   await fbPatch(id, { checked: !items[id].checked });
 }
+const deleteTimeouts = {};
+
 function removeItem(id) {
   const el = document.querySelector(`.list-item[data-id="${id}"]`);
-  if (el) { el.classList.add('fade-out'); setTimeout(() => fbDelete(id), 210); }
-  else    { fbDelete(id); }
+  if (el) {
+    el.classList.add('fade-out');
+    setTimeout(() => { if (el) el.style.display = 'none'; }, 210);
+  }
+  
+  toast(`Eliminado <button class="btn-raw" style="text-decoration:underline;margin-left:12px;font-weight:600" onclick="undoRemove('${id}')">DESHACER</button>`, true);
+  
+  // Aumentar el tiempo de este toast específico
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => document.getElementById('toast').classList.remove('in'), 4000);
+
+  deleteTimeouts[id] = setTimeout(() => {
+    fbDelete(id);
+    delete deleteTimeouts[id];
+  }, 4000);
+}
+
+function undoRemove(id) {
+  if (deleteTimeouts[id]) {
+    clearTimeout(deleteTimeouts[id]);
+    delete deleteTimeouts[id];
+    
+    const el = document.querySelector(`.list-item[data-id="${id}"]`);
+    if (el) {
+      el.style.display = '';
+      el.classList.remove('fade-out');
+    }
+    document.getElementById('toast').classList.remove('in');
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -260,7 +493,7 @@ async function saveEdit() {
   }
   await fbPatch(editingId, {
     name,
-    price:    Math.max(0, parseFloat(document.getElementById('ePrice').value) || 0),
+    price:    Math.max(0, parsePrice(document.getElementById('ePrice').value)),
     quantity: Math.max(1, parseInt(document.getElementById('eQty').value)     || 1),
   });
   closeEdit();
@@ -277,7 +510,12 @@ function renderList() {
   const totBlock = document.getElementById('totalsBlock');
   const shrBlock = document.getElementById('shareBlock');
 
-  const ids = Object.keys(items).sort((a, b) => (items[a].ts || 0) - (items[b].ts || 0));
+  const ids = Object.keys(items).sort((a, b) => {
+    const checkA = items[a].checked ? 1 : 0;
+    const checkB = items[b].checked ? 1 : 0;
+    if (checkA !== checkB) return checkA - checkB;
+    return (items[a].ts || 0) - (items[b].ts || 0);
+  });
 
   list.querySelectorAll('.list-item').forEach(el => {
     if (!items[el.dataset.id]) el.remove();
@@ -344,8 +582,8 @@ function renderList() {
       <div class="item-row-meta">
         <span class="item-price-info">${priceInfo}</span>
         <span class="item-actions">
-          <button onclick="openEdit('${id}')">edit</button>
-          <button onclick="removeItem('${id}')">del</button>
+          <button class="btn-edit" onclick="openEdit('${id}')">editar</button>
+          <button class="btn-del" onclick="removeItem('${id}')">eliminar</button>
         </span>
       </div>`;
   });
@@ -354,12 +592,18 @@ function renderList() {
 }
 
 function renderTotals(total, count) {
+  const discount = extra.discount || 0;
+  const finalTotal = total * (1 - discount / 100);
+
   document.getElementById('subtotalCount').textContent = count;
   document.getElementById('subtotalAmt').textContent   = '$' + fmtAR(total);
-  document.getElementById('totalAmt').textContent      = '$' + fmtAR(total);
+  document.getElementById('totalAmt').textContent      = '$' + fmtAR(finalTotal);
+  
+  const dInp = document.getElementById('iDiscount');
+  if (dInp && document.activeElement !== dInp) dInp.value = discount || '';
 
   const spent    = spentThisMonth();
-  const combined = spent + total;
+  const combined = spent + finalTotal;
   const budget   = extra.budget;
   const pct      = budget > 0 ? Math.min(100, Math.round((combined / budget) * 100)) : 0;
   const remain   = budget - combined;
@@ -445,7 +689,7 @@ function renderHistoryView() {
 
         <div class="history-entry-footer">
           ${fbId
-            ? `<button class="history-del-btn" onclick="confirmDeleteHistory('${fbId}')">del</button>`
+            ? `<button class="history-del-btn" onclick="confirmDeleteHistory('${fbId}')">eliminar</button>`
             : ''}
         </div>
 
@@ -519,17 +763,13 @@ function renderBudgetView() {
       <span>100%</span>
     </div>
 
-    <div class="budget-edit-label lbl">Editar presupuesto</div>
-    <input type="range" id="budgetSlider"
-           min="20000" max="300000" step="5000" value="${budget}"
-           oninput="onBudgetSlider(this.value)">
-    <div class="budget-slider-scale">
-      <span>$20.000</span>
-      <span id="budgetSliderVal" style="font-weight:600">$${fmtAR(budget)}/mes</span>
-      <span>$300.000</span>
+    <div class="budget-edit-label lbl">Presupuesto mensual</div>
+    <div class="budget-edit-wrap">
+      <span class="budget-edit-prefix">$</span>
+      <input type="text" id="budgetInput" class="inp" inputmode="numeric" value="${budget}" onfocus="this.select()" onblur="onBudgetChange(this.value)" onkeydown="if(event.key==='Enter') this.blur()">
     </div>
 
-    <div class="lbl" style="opacity:.55;margin-bottom:12px">Últimos 3 meses</div>
+    <div class="lbl" style="opacity:.55;margin-bottom:12px;margin-top:16px;">Últimos 3 meses</div>
     ${pastMonths.map(row => {
       const p = Math.min(100, Math.round((row.spent / row.budget) * 100));
       return `
@@ -545,38 +785,17 @@ function renderBudgetView() {
     }).join('')}`;
 }
 
-/* Actualiza solo los valores visibles — NO re-renderiza la vista completa */
-function onBudgetSlider(val) {
-  const n      = Number(val);
+/* Actualiza el presupuesto */
+function onBudgetChange(val) {
+  let n = parseInt(String(val).replace(/\\D/g, ''), 10);
+  if (isNaN(n) || n < 0) n = extra.budget;
+  
   extra.budget = n;
   saveExtra();
+  fbBudgetPut(n); // Sincronizar en Firebase
 
-  /* Label del slider */
-  const lblEl = document.getElementById('budgetSliderVal');
-  if (lblEl) lblEl.textContent = `$${fmtAR(n)}/mes`;
-
-  /* Recalcular */
-  const total    = calcCurrentTotal();
-  const spent    = spentThisMonth();
-  const combined = spent + total;
-  const pct      = n > 0 ? Math.min(100, Math.round((combined / n) * 100)) : 0;
-  const remain   = n - combined;
-
-  /* Actualizar displays de la vista */
-  const amtEl = document.getElementById('budgetViewAmount');
-  const subEl = document.getElementById('budgetViewSub');
-  const pctEl = document.getElementById('budgetViewPct');
-  if (amtEl) amtEl.textContent = `$${fmtAR(remain)}`;
-  if (subEl) subEl.textContent = `de $${fmtAR(n)} · gastaste $${fmtAR(combined)}`;
-  if (pctEl) pctEl.textContent = `${pct}%`;
-
-  /* Actualizar celdas de la barra segmentada */
-  document.querySelectorAll('#segBar .seg-bar-cell').forEach((cell, i) => {
-    cell.classList.toggle('filled', (i + 1) / 20 * 100 <= pct);
-  });
-
-  /* Actualizar barra del main screen */
-  renderTotals(total, Object.keys(items).length);
+  renderBudgetView(); // Re-render completo
+  renderTotals(calcCurrentTotal(), Object.keys(items).length);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -642,7 +861,12 @@ function buildWAMessage() {
     const sub = (it.price || 0) * qty;
     lines.push(`• ${qty > 1 ? `${qty}× ` : ''}${it.name}${it.price > 0 ? ` — $${fmtAR(sub)}` : ''}`);
   });
-  lines.push('', `*Total: $${fmtAR(total)}*`, '', '— Enviado desde ListBuy');
+  const discount = extra.discount || 0;
+  const finalTotal = total * (1 - discount / 100);
+
+  lines.push('', `Subtotal: $${fmtAR(total)}`);
+  if (discount > 0) lines.push(`Descuento: -${discount}%`);
+  lines.push(`*Total: $${fmtAR(finalTotal)}*`, '', '— Enviado desde ListBuy');
   return lines.join('\n');
 }
 
@@ -696,7 +920,14 @@ async function archivePurchase() {
     extra.history.unshift({ ...entry, fbId });
     saveExtra();
     btn.textContent = '✓ GUARDADO EN HISTORIAL';
-    toast('¡Compra guardada!');
+    
+    // Vaciar lista actual
+    for (const id of ids) {
+      fbDelete(id); // Fire and forget para limpiar
+    }
+
+    toast('¡Compra guardada y lista vaciada!');
+    setTimeout(closeShare, 1200);
   } catch (_) {
     btn.disabled    = false;
     btn.textContent = 'GUARDAR EN HISTORIAL';
@@ -718,12 +949,16 @@ function openModal(backdropId, panelId) {
   const panel = document.getElementById(panelId);
   panel.hidden = false;
   requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add('open')));
+  const scrollArea = document.getElementById('receiptScroll');
+  if (scrollArea) scrollArea.setAttribute('inert', '');
 }
 function closeModal(backdropId, panelId) {
   document.getElementById(backdropId).classList.remove('open');
   const panel = document.getElementById(panelId);
   panel.classList.remove('open');
   panel.addEventListener('transitionend', () => { panel.hidden = true; }, { once: true });
+  const scrollArea = document.getElementById('receiptScroll');
+  if (scrollArea) scrollArea.removeAttribute('inert');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -755,12 +990,69 @@ document.getElementById('menuBackdrop').addEventListener('click', closeMenu);
 document.getElementById('shareBackdrop').addEventListener('click', closeShare);
 document.getElementById('editBackdrop').addEventListener('click', closeEdit);
 
+/* ── Descuento global ── */
+const discountInp = document.getElementById('iDiscount');
+if (discountInp) {
+  discountInp.addEventListener('input', e => {
+    let val = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
+    extra.discount = val;
+    saveExtra();
+    fbDiscountPut(val);
+    renderTotals(calcCurrentTotal(), Object.keys(items).length);
+  });
+}
+
+/* ── Autocompletado ── */
+window.selectAutoItem = function(name, price) {
+  const nEl = document.getElementById('iName');
+  const pEl = document.getElementById('iPrice');
+  nEl.value = name;
+  if (price > 0) pEl.value = price;
+  const menu = document.getElementById('autoMenu');
+  if (menu) menu.hidden = true;
+  document.getElementById('iQty').focus();
+};
+
+document.getElementById('iName').addEventListener('input', e => {
+  const val = e.target.value.trim().toLowerCase();
+  const menu = document.getElementById('autoMenu');
+  if (!menu) return;
+  if (!val) { menu.hidden = true; return; }
+  
+  const uniqueMap = new Map();
+  for (const h of extra.history) {
+    for (const it of (h.items || [])) {
+      if (!uniqueMap.has(it.name.toLowerCase())) {
+        uniqueMap.set(it.name.toLowerCase(), { name: it.name, price: it.price });
+      }
+    }
+  }
+  
+  const matches = Array.from(uniqueMap.values()).filter(it => it.name.toLowerCase().includes(val));
+  if (matches.length > 0) {
+    menu.innerHTML = matches.slice(0, 5).map(m => `
+      <div class="auto-item" onclick="window.selectAutoItem('${esc(m.name).replace(/'/g, "\\'")}', ${m.price || 0})">
+        <span class="auto-item-name">${esc(m.name)}</span>
+        <span class="auto-item-price">${m.price > 0 ? '$' + fmtAR(m.price) : ''}</span>
+      </div>
+    `).join('');
+    menu.hidden = false;
+  } else {
+    menu.hidden = true;
+  }
+});
+
+document.addEventListener('click', e => {
+  const menu = document.getElementById('autoMenu');
+  const wrap = document.querySelector('.autocomplete-wrap');
+  if (menu && !menu.hidden && wrap && !wrap.contains(e.target)) {
+    menu.hidden = true;
+  }
+});
+
 /* ═══════════════════════════════════════════════════════════════
    INICIALIZACIÓN
 ═══════════════════════════════════════════════════════════════ */
 applyTheme(localStorage.getItem('lb_theme') || 'light');
 document.getElementById('ticketRef').textContent   = `N° ${RECEIPT_NUM} · ${fmtReceiptDate()}`;
 document.getElementById('drawerMonth').textContent = currentMonthLabel();
-
-fetchHistory();   /* carga historial desde Firebase */
-connectSSE();     /* conecta lista en tiempo real   */
