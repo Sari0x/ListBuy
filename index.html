@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
+
 <head>
+  <meta name="google-site-verification" content="_naHq4vvso91gbnIo_gobj_IdoHTW6C8GX6FAPkKmQM" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -8,7 +10,8 @@
   <title>LISTBUY</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -18,7 +21,8 @@
 
     <!-- Borde superior dentado -->
     <svg class="paper-edge" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0,0 L0,3 L4,6 L8,3 L12,6 L16,3 L20,6 L24,3 L28,6 L32,3 L36,6 L40,3 L44,6 L48,3 L52,6 L56,3 L60,6 L64,3 L68,6 L72,3 L76,6 L80,3 L84,6 L88,3 L92,6 L96,3 L100,6 L100,0 Z"/>
+      <path
+        d="M0,0 L0,3 L4,6 L8,3 L12,6 L16,3 L20,6 L24,3 L28,6 L32,3 L36,6 L40,3 L44,6 L48,3 L52,6 L56,3 L60,6 L64,3 L68,6 L72,3 L76,6 L80,3 L84,6 L88,3 L92,6 L96,3 L100,6 L100,0 Z" />
     </svg>
 
     <!-- Área de scroll del recibo -->
@@ -41,10 +45,11 @@
       <!-- Formulario de carga -->
       <section class="add-section">
         <div class="lbl add-label">+ NUEVO ITEM</div>
-        <input id="iName"  class="inp" type="text"   placeholder="producto…"  maxlength="50" autocomplete="off" autocorrect="off" spellcheck="false">
+        <input id="iName" class="inp" type="text" placeholder="producto…" maxlength="50" autocomplete="off"
+          autocorrect="off" spellcheck="false">
         <div class="inp-grid">
-          <input id="iPrice" class="inp" type="number" placeholder="precio"     min="0"  step="1"   inputmode="numeric">
-          <input id="iQty"   class="inp" type="number" placeholder="cant."      min="1"  max="999"  inputmode="numeric">
+          <input id="iPrice" class="inp" type="text" placeholder="precio" inputmode="decimal" autocomplete="off">
+          <input id="iQty" class="inp" type="number" placeholder="cant." min="1" max="999" inputmode="numeric">
         </div>
         <button class="btn-primary" id="btnAdd">AGREGAR ›</button>
       </section>
@@ -99,7 +104,8 @@
 
     <!-- Borde inferior dentado -->
     <svg class="paper-edge paper-edge-flip" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0,0 L0,3 L4,6 L8,3 L12,6 L16,3 L20,6 L24,3 L28,6 L32,3 L36,6 L40,3 L44,6 L48,3 L52,6 L56,3 L60,6 L64,3 L68,6 L72,3 L76,6 L80,3 L84,6 L88,3 L92,6 L96,3 L100,6 L100,0 Z"/>
+      <path
+        d="M0,0 L0,3 L4,6 L8,3 L12,6 L16,3 L20,6 L24,3 L28,6 L32,3 L36,6 L40,3 L44,6 L48,3 L52,6 L56,3 L60,6 L64,3 L68,6 L72,3 L76,6 L80,3 L84,6 L88,3 L92,6 L96,3 L100,6 L100,0 Z" />
     </svg>
 
     <!-- Toggle de tema (flotante) -->
@@ -164,8 +170,8 @@
       <div class="sep-dotted" style="margin:18px 0 14px"></div>
 
       <div class="lbl" style="margin-bottom:8px; opacity:.55">ARCHIVAR COMPRA</div>
-      <input id="archiveStore" class="inp" type="text"
-             placeholder="Nombre del local (ej: Coto, Disco…)" autocomplete="off">
+      <input id="archiveStore" class="inp" type="text" placeholder="Nombre del local (ej: Coto, Disco…)"
+        autocomplete="off">
       <button class="btn-outline" id="btnArchive" style="margin-top:12px; width:100%">
         GUARDAR EN HISTORIAL
       </button>
@@ -175,10 +181,10 @@
     <div class="modal-backdrop" id="editBackdrop" aria-hidden="true"></div>
     <div class="edit-sheet" id="editSheet" role="dialog" aria-modal="true" aria-label="Editar producto" hidden>
       <div class="lbl" style="margin-bottom:16px; opacity:.55">EDITAR ITEM</div>
-      <input id="eName"  class="inp" type="text"   placeholder="nombre…"  maxlength="50" autocomplete="off">
+      <input id="eName" class="inp" type="text" placeholder="nombre…" maxlength="50" autocomplete="off">
       <div class="inp-grid" style="margin-top:0; margin-bottom:16px">
-        <input id="ePrice" class="inp" type="number" placeholder="precio"  min="0" step="1"  inputmode="numeric">
-        <input id="eQty"   class="inp" type="number" placeholder="cant."   min="1" max="999" inputmode="numeric">
+        <input id="ePrice" class="inp" type="number" placeholder="precio" min="0" step="1" inputmode="numeric">
+        <input id="eQty" class="inp" type="number" placeholder="cant." min="1" max="999" inputmode="numeric">
       </div>
       <button class="btn-primary" id="btnSaveEdit">GUARDAR</button>
     </div>
@@ -190,4 +196,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
