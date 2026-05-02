@@ -1,4 +1,4 @@
-const CACHE_NAME = 'listbuy-v2';
+const CACHE_NAME = 'listbuy-v3';
 const ASSETS = [
   './',
   './index.html',
