@@ -334,6 +334,11 @@ input {
   padding-left: 14px;
 }
 
+select.inp {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
 .inp-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;

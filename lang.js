@@ -57,7 +57,27 @@ const dict = {
     settings_title: "Ajustes",
     lbl_theme: "TEMA VISUAL",
     theme_light: "Claro",
-    theme_dark: "Oscuro"
+    theme_dark: "Oscuro",
+    btn_edit: "editar",
+    btn_remove: "eliminar",
+    item_unit: "unid.",
+    item_no_price: "sin precio",
+    budget_remaining_lbl: "restan",
+    budget_exceeded_lbl: "excede",
+    budget_of: "de",
+    budget_available: "Disponible",
+    budget_spent_verb: "gastaste",
+    budget_last_months: "Últimos 3 meses",
+    drawer_list: "Lista actual",
+    drawer_purchases: "compras",
+    drawer_per_month: "/mes",
+    drawer_evolution: "evolución",
+    history_empty: "— SIN COMPRAS PREVIAS —",
+    history_no_name: "Sin nombre",
+    history_deleted: "Compra eliminada del historial",
+    item_updated: "¡Producto actualizado!",
+    confirm_del_purchase: "¿Eliminar esta compra?",
+    btn_yes_delete: "SÍ, ELIMINAR"
   },
   en: {
     loading: "LOADING...",
@@ -117,7 +137,27 @@ const dict = {
     settings_title: "Settings",
     lbl_theme: "THEME",
     theme_light: "Light",
-    theme_dark: "Dark"
+    theme_dark: "Dark",
+    btn_edit: "edit",
+    btn_remove: "remove",
+    item_unit: "unit.",
+    item_no_price: "no price",
+    budget_remaining_lbl: "remaining",
+    budget_exceeded_lbl: "exceeded",
+    budget_of: "of",
+    budget_available: "Available",
+    budget_spent_verb: "you spent",
+    budget_last_months: "Last 3 months",
+    drawer_list: "Current list",
+    drawer_purchases: "purchases",
+    drawer_per_month: "/month",
+    drawer_evolution: "evolution",
+    history_empty: "— NO PREVIOUS PURCHASES —",
+    history_no_name: "No name",
+    history_deleted: "Purchase deleted from history",
+    item_updated: "Product updated!",
+    confirm_del_purchase: "Delete this purchase?",
+    btn_yes_delete: "YES, DELETE"
   },
   it: {
     loading: "CARICAMENTO...",
@@ -177,7 +217,27 @@ const dict = {
     settings_title: "Impostazioni",
     lbl_theme: "TEMA",
     theme_light: "Chiaro",
-    theme_dark: "Scuro"
+    theme_dark: "Scuro",
+    btn_edit: "modifica",
+    btn_remove: "elimina",
+    item_unit: "unità",
+    item_no_price: "senza prezzo",
+    budget_remaining_lbl: "rimangono",
+    budget_exceeded_lbl: "supera",
+    budget_of: "di",
+    budget_available: "Disponibile",
+    budget_spent_verb: "hai speso",
+    budget_last_months: "Ultimi 3 mesi",
+    drawer_list: "Lista corrente",
+    drawer_purchases: "acquisti",
+    drawer_per_month: "/mese",
+    drawer_evolution: "evoluzione",
+    history_empty: "— NESSUN ACQUISTO PRECEDENTE —",
+    history_no_name: "Senza nome",
+    history_deleted: "Acquisto eliminato dalla cronologia",
+    item_updated: "Prodotto aggiornato!",
+    confirm_del_purchase: "Eliminare questo acquisto?",
+    btn_yes_delete: "SÌ, ELIMINA"
   },
   pt: {
     loading: "CARREGANDO...",
@@ -237,7 +297,27 @@ const dict = {
     settings_title: "Configurações",
     lbl_theme: "TEMA VISUAL",
     theme_light: "Claro",
-    theme_dark: "Escuro"
+    theme_dark: "Escuro",
+    btn_edit: "editar",
+    btn_remove: "remover",
+    item_unit: "unid.",
+    item_no_price: "sem preço",
+    budget_remaining_lbl: "restam",
+    budget_exceeded_lbl: "excede",
+    budget_of: "de",
+    budget_available: "Disponível",
+    budget_spent_verb: "você gastou",
+    budget_last_months: "Últimos 3 meses",
+    drawer_list: "Lista atual",
+    drawer_purchases: "compras",
+    drawer_per_month: "/mês",
+    drawer_evolution: "evolução",
+    history_empty: "— SEM COMPRAS ANTERIORES —",
+    history_no_name: "Sem nome",
+    history_deleted: "Compra removida do histórico",
+    item_updated: "Produto atualizado!",
+    confirm_del_purchase: "Excluir esta compra?",
+    btn_yes_delete: "SIM, EXCLUIR"
   },
   fr: {
     loading: "CHARGEMENT...",
@@ -297,7 +377,27 @@ const dict = {
     settings_title: "Paramètres",
     lbl_theme: "THÈME VISUEL",
     theme_light: "Clair",
-    theme_dark: "Sombre"
+    theme_dark: "Sombre",
+    btn_edit: "modifier",
+    btn_remove: "supprimer",
+    item_unit: "unité",
+    item_no_price: "sans prix",
+    budget_remaining_lbl: "restent",
+    budget_exceeded_lbl: "dépasse",
+    budget_of: "de",
+    budget_available: "Disponible",
+    budget_spent_verb: "vous avez dépensé",
+    budget_last_months: "3 derniers mois",
+    drawer_list: "Liste actuelle",
+    drawer_purchases: "achats",
+    drawer_per_month: "/mois",
+    drawer_evolution: "évolution",
+    history_empty: "— AUCUN ACHAT PRÉCÉDENT —",
+    history_no_name: "Sans nom",
+    history_deleted: "Achat supprimé de l'historique",
+    item_updated: "Produit mis à jour !",
+    confirm_del_purchase: "Supprimer cet achat ?",
+    btn_yes_delete: "OUI, SUPPRIMER"
   },
   de: {
     loading: "LÄDT...",
@@ -357,7 +457,27 @@ const dict = {
     settings_title: "Einstellungen",
     lbl_theme: "THEMA",
     theme_light: "Hell",
-    theme_dark: "Dunkel"
+    theme_dark: "Dunkel",
+    btn_edit: "bearbeiten",
+    btn_remove: "entfernen",
+    item_unit: "Einh.",
+    item_no_price: "kein Preis",
+    budget_remaining_lbl: "übrig",
+    budget_exceeded_lbl: "überschritten",
+    budget_of: "von",
+    budget_available: "Verfügbar",
+    budget_spent_verb: "ausgegeben",
+    budget_last_months: "Letzte 3 Monate",
+    drawer_list: "Aktuelle Liste",
+    drawer_purchases: "Einkäufe",
+    drawer_per_month: "/Monat",
+    drawer_evolution: "Verlauf",
+    history_empty: "— KEINE VORHERIGEN EINKÄUFE —",
+    history_no_name: "Kein Name",
+    history_deleted: "Einkauf aus dem Verlauf gelöscht",
+    item_updated: "Produkt aktualisiert!",
+    confirm_del_purchase: "Diesen Einkauf löschen?",
+    btn_yes_delete: "JA, LÖSCHEN"
   }
 };
 
@@ -397,10 +517,7 @@ function applyTranslations() {
     el.placeholder = t(key);
   });
   
-  // Si la función initSettings está en app.js y ya cargó, re-renderiza el drawer
-  if (typeof renderDrawerMenu === 'function') {
-    renderDrawerMenu();
-  }
+  if (typeof refreshPageTexts === 'function') refreshPageTexts();
 }
 
 // Ejecutar inmediatamente en la carga para traducir el HTML

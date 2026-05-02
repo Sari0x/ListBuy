@@ -314,20 +314,24 @@ function fmtAR(n) {
   return new Intl.NumberFormat('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
     .format(Math.round(n));
 }
+function langLocale() {
+  const map = { es: 'es-AR', en: 'en-US', it: 'it-IT', pt: 'pt-BR', fr: 'fr-FR', de: 'de-DE' };
+  return map[currentLang] || 'es-AR';
+}
 function fmtDate(iso) {
   const d = new Date(iso + 'T12:00:00');
-  return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+  return d.toLocaleDateString(langLocale(), { day: '2-digit', month: 'short' });
 }
 function fmtReceiptDate() {
   const now = new Date();
   const d   = String(now.getDate()).padStart(2, '0');
-  const m   = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][now.getMonth()];
+  const m   = now.toLocaleDateString(langLocale(), { month: 'short' }).toUpperCase().replace(/\./g, '');
   const y   = String(now.getFullYear()).slice(2);
   return `${d}·${m}·${y}`;
 }
 function currentMonthLabel() {
   const now = new Date();
-  return now.toLocaleDateString('es-AR', { month: 'long' }) + ' · ' + now.getFullYear();
+  return now.toLocaleDateString(langLocale(), { month: 'long' }) + ' · ' + now.getFullYear();
 }
 function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -500,7 +504,7 @@ async function saveEdit() {
     quantity: Math.max(1, parseInt(document.getElementById('eQty').value)     || 1),
   });
   closeEdit();
-  toast('¡Producto actualizado!');
+  toast(t('item_updated'));
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -524,7 +528,7 @@ function renderList() {
     if (!items[el.dataset.id]) el.remove();
   });
 
-  countLbl.textContent = `${ids.length} ${ids.length === 1 ? 'ITEM' : 'ITEMS'} · ABIERTA`;
+  countLbl.textContent = `${ids.length} ${t('lbl_items')} · ${t('lbl_open')}`;
 
   if (ids.length === 0) {
     empty.hidden    = false;
@@ -572,7 +576,7 @@ function renderList() {
 
     const priceInfo = it.price > 0
       ? `${qty > 1 ? `${qty} × ` : ''}$${fmtAR(it.price)}${deltaHtml}`
-      : `${qty > 1 ? `${qty} unid.` : 'sin precio'}`;
+      : `${qty > 1 ? `${qty} ${t('item_unit')}` : t('item_no_price')}`;
 
     li.innerHTML = `
       <div class="item-row-main">
@@ -585,8 +589,8 @@ function renderList() {
       <div class="item-row-meta">
         <span class="item-price-info">${priceInfo}</span>
         <span class="item-actions">
-          <button class="btn-edit" onclick="openEdit('${id}')">editar</button>
-          <button class="btn-del" onclick="removeItem('${id}')">eliminar</button>
+          <button class="btn-edit" onclick="openEdit('${id}')">${t('btn_edit')}</button>
+          <button class="btn-del" onclick="removeItem('${id}')">${t('btn_remove')}</button>
         </span>
       </div>`;
   });
@@ -615,21 +619,21 @@ function renderTotals(total, count) {
   document.getElementById('budgetFill').style.width   = `${pct}%`;
   document.getElementById('budgetSpent').textContent  = `$${fmtAR(combined)} / $${fmtAR(budget)}`;
   document.getElementById('budgetRemain').textContent = remain >= 0
-    ? `restan $${fmtAR(remain)}` : `excede $${fmtAR(-remain)}`;
+    ? `${t('budget_remaining_lbl')} $${fmtAR(remain)}` : `${t('budget_exceeded_lbl')} $${fmtAR(-remain)}`;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    MENÚ DRAWER
 ═══════════════════════════════════════════════════════════════ */
-function openMenu() {
+function renderDrawerMenu() {
   document.getElementById('drawerMonth').textContent = currentMonthLabel();
   const ids = Object.keys(items);
   const nav = document.getElementById('drawerNav');
   const navItems = [
-    { id: 'list',    label: 'Lista actual',   meta: `${ids.length} items` },
-    { id: 'history', label: 'Historial',       meta: `${extra.history.length} compras` },
-    { id: 'budget',  label: 'Presupuesto',      meta: `$${fmtAR(extra.budget)}/mes` },
-    { id: 'compare', label: 'Comparar precios', meta: 'evolución' },
+    { id: 'list',    label: t('drawer_list'),   meta: `${ids.length} ${t('lbl_items')}` },
+    { id: 'history', label: t('title_history'), meta: `${extra.history.length} ${t('drawer_purchases')}` },
+    { id: 'budget',  label: t('title_budget'),  meta: `$${fmtAR(extra.budget)}${t('drawer_per_month')}` },
+    { id: 'compare', label: t('title_compare'), meta: t('drawer_evolution') },
   ];
   nav.innerHTML = navItems.map(it => `
     <button class="drawer-item"
@@ -637,6 +641,9 @@ function openMenu() {
       <span class="drawer-item-name">${it.label}</span>
       <span class="drawer-item-meta">${it.meta}</span>
     </button>`).join('');
+}
+function openMenu() {
+  renderDrawerMenu();
   document.getElementById('menuBackdrop').classList.add('open');
   document.getElementById('menuDrawer').classList.add('open');
 }
@@ -666,7 +673,7 @@ function closeView(id) {
 function renderHistoryView() {
   const body = document.getElementById('historyBody');
   if (!extra.history.length) {
-    body.innerHTML = `<p class="lbl" style="padding:40px 0;text-align:center;opacity:.4">— SIN COMPRAS PREVIAS —</p>`;
+    body.innerHTML = `<p class="lbl" style="padding:40px 0;text-align:center;opacity:.4">${t('history_empty')}</p>`;
     return;
   }
 
@@ -676,8 +683,8 @@ function renderHistoryView() {
       <div class="history-entry" id="he_${fbId}">
         <div class="history-entry-hdr">
           <div>
-            <div class="history-store">${esc(h.store || 'Sin nombre')}</div>
-            <div class="history-date lbl">${fmtDate(h.date)} · ${(h.items || []).length} items</div>
+            <div class="history-store">${esc(h.store || t('history_no_name'))}</div>
+            <div class="history-date lbl">${fmtDate(h.date)} · ${(h.items || []).length} ${t('lbl_items').toLowerCase()}</div>
           </div>
           <div class="history-total">$${fmtAR(h.total)}</div>
         </div>
@@ -692,15 +699,15 @@ function renderHistoryView() {
 
         <div class="history-entry-footer">
           ${fbId
-            ? `<button class="history-del-btn" onclick="confirmDeleteHistory('${fbId}')">eliminar</button>`
+            ? `<button class="history-del-btn" onclick="confirmDeleteHistory('${fbId}')">${t('btn_remove')}</button>`
             : ''}
         </div>
 
         <div class="history-confirm" id="hc_${fbId}" hidden>
-          <div class="history-confirm-label">¿Eliminar esta compra?</div>
+          <div class="history-confirm-label">${t('confirm_del_purchase')}</div>
           <div class="history-confirm-actions">
-            <button class="btn-outline flex-1" onclick="doDeleteHistory('${fbId}')">SÍ, ELIMINAR</button>
-            <button class="btn-outline flex-1" onclick="cancelDeleteHistory('${fbId}')">CANCELAR</button>
+            <button class="btn-outline flex-1" onclick="doDeleteHistory('${fbId}')">${t('btn_yes_delete')}</button>
+            <button class="btn-outline flex-1" onclick="cancelDeleteHistory('${fbId}')">${t('btn_cancel').toUpperCase()}</button>
           </div>
         </div>
       </div>`;
@@ -726,7 +733,7 @@ async function doDeleteHistory(fbId) {
   extra.history = extra.history.filter(h => h.fbId !== fbId);
   saveExtra();
   renderHistoryView();
-  toast('Compra eliminada del historial');
+  toast(t('history_deleted'));
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -742,7 +749,7 @@ function renderBudgetView() {
   const remain   = budget - combined;
 
   document.getElementById('budgetViewTitle').textContent =
-    'Presupuesto · ' + new Date().toLocaleDateString('es-AR', { month: 'long' });
+    t('title_budget') + ' · ' + new Date().toLocaleDateString(langLocale(), { month: 'long' });
 
   const segments = Array.from({ length: 20 }, (_, i) =>
     `<div class="seg-bar-cell${(i + 1) / 20 * 100 <= pct ? ' filled' : ''}"></div>`
@@ -755,9 +762,9 @@ function renderBudgetView() {
   ];
 
   body.innerHTML = `
-    <div class="budget-view-available lbl">Disponible</div>
+    <div class="budget-view-available lbl">${t('budget_available')}</div>
     <div class="budget-view-amount" id="budgetViewAmount">$${fmtAR(remain)}</div>
-    <div class="budget-view-sub"    id="budgetViewSub">de $${fmtAR(budget)} · gastaste $${fmtAR(combined)}</div>
+    <div class="budget-view-sub"    id="budgetViewSub">${t('budget_of')} $${fmtAR(budget)} · ${t('budget_spent_verb')} $${fmtAR(combined)}</div>
 
     <div class="seg-bar" id="segBar">${segments}</div>
     <div class="budget-scale lbl">
@@ -766,13 +773,13 @@ function renderBudgetView() {
       <span>100%</span>
     </div>
 
-    <div class="budget-edit-label lbl">Presupuesto mensual</div>
+    <div class="budget-edit-label lbl">${t('lbl_budget')}</div>
     <div class="budget-edit-wrap">
       <span class="budget-edit-prefix">$</span>
       <input type="text" id="budgetInput" class="inp" inputmode="numeric" value="${budget}" onfocus="this.select()" onblur="onBudgetChange(this.value)" onkeydown="if(event.key==='Enter') this.blur()">
     </div>
 
-    <div class="lbl" style="opacity:.55;margin-bottom:12px;margin-top:16px;">Últimos 3 meses</div>
+    <div class="lbl" style="opacity:.55;margin-bottom:12px;margin-top:16px;">${t('budget_last_months')}</div>
     ${pastMonths.map(row => {
       const p = Math.min(100, Math.round((row.spent / row.budget) * 100));
       return `
@@ -1052,6 +1059,15 @@ document.addEventListener('click', e => {
     menu.hidden = true;
   }
 });
+
+/* ═══════════════════════════════════════════════════════════════
+   REFRESH AL CAMBIAR IDIOMA
+═══════════════════════════════════════════════════════════════ */
+function refreshPageTexts() {
+  document.getElementById('ticketRef').textContent   = `N° ${RECEIPT_NUM} · ${fmtReceiptDate()}`;
+  document.getElementById('drawerMonth').textContent = currentMonthLabel();
+  renderList();
+}
 
 /* ═══════════════════════════════════════════════════════════════
    INICIALIZACIÓN
