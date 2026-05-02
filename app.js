@@ -28,7 +28,10 @@ firebase.auth().onAuthStateChanged(user => {
   const guestData = JSON.parse(localStorage.getItem('lb_guest') || 'null');
   
   if (user) {
-    setupUserEnv(user.uid, user.displayName || user.email || 'Anónimo');
+    // Usar el email como llave en Firebase si existe (reemplazando puntos por comas)
+    // Si no tiene email (modo anónimo), usamos su UID de Firebase
+    const dbKey = user.email ? user.email.replace(/\./g, ',') : user.uid;
+    setupUserEnv(dbKey, user.displayName || user.email || 'Anónimo');
   } else if (guestData) {
     setupUserEnv(guestData.id, guestData.name + ' (Invitado)');
   } else {
